@@ -89,7 +89,16 @@ login_button = Button(login_frame,width=30,pady=7,text='Login',bg='#343131',fg='
 def close_window():
     root.destroy()
 
-close_button = Button(root, width=3, height=0, text='X', bg="#c27572", fg="black", font=['Robotto', 10, 'bold'],command=close_window )
-close_button.place(x=890,y=470)
+def colour_change(event):
+    close_button.config(bg='#c27572')
+def colour_revert(event):
+    close_button.config(bg='#343131')
+
+
+close_button = Button(root, width=3, height=0, text='X', bg="#343131", fg="black", font=['Robotto', 10, 'bold'],command=close_window )
+close_button.place(x=890,y=0)
+close_button.config(relief="flat")
+close_button.bind('<Enter>',colour_change)
+close_button.bind('<Leave>',colour_revert)
 
 root.mainloop()
