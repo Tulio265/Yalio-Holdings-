@@ -1,3 +1,5 @@
+from typing import Any
+
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -5,6 +7,7 @@ import ast
 
 root = Tk()
 root.title('Yalio Holdings - Login')
+root.overrideredirect(True)
 root.resizable(False,False)
 root.configure(bg='#343131')
 
@@ -28,9 +31,9 @@ login_frame = Frame(root,width=350,height=390,bg='#343131')
 #login_frame.config(borderwidth=5,relief='ridge')
 login_frame.place(y=50,x=480)
 
-login_label = ttk.Label(login_frame,foreground='#9bddff',background='#343131',text='Login',font=('Dubai',22,'bold'))
+login_label = ttk.Label(login_frame,foreground='#c27572',background='#343131',text='Login',font=('Dubai',22,'bold'))
 #login_label.grid(column=3,row=1)
-login_label.place(y=50,x=5)
+login_label.place(y=55,x=5)
 
 def on_enter(e):
     username_entry.delete(0,'end')
@@ -38,10 +41,10 @@ def on_leave(e):
     if username_entry.get()=='':
         username_entry.insert(0,'Usename or Email')
 
-username_entry =Entry(login_frame,width=25,border=0,background='#343131',foreground='#9bddff',font=('Dubai',11))
-username_entry.place(y=100,x=10)
+username_entry =Entry(login_frame,width=25,border=0,background='#343131',foreground='#c27572',font=('Dubai',11))
+username_entry.place(y=130,x=10)
 username_entry.insert(0,'Username or Email')
-Frame(login_frame,width=256,height=2,bg='white').place(y=122,x=10)
+Frame(login_frame,width=256,height=2,bg='white').place(y=152,x=10)
 username_entry.bind('<Enter>',on_enter)
 username_entry.bind('<Leave>',on_leave)
 
@@ -63,10 +66,10 @@ password_entry = Entry(
     width=25,
     border=0,
     background="#343131",
-    foreground="#9bddff",
+    foreground="#c27572",
     font=("Dubai", 11),
 )
-password_entry.place(y=150, x=10)
+password_entry.place(y=180, x=10)
 password_entry.insert(0, "Password")
 
 Frame(
@@ -74,13 +77,19 @@ Frame(
     width=256,
     height=2,
     bg="white"
-).place(y=172, x=10)
+).place(y=202, x=10)
 
 password_entry.bind("<FocusIn>", on_enter)
 password_entry.bind("<FocusOut>", on_leave)
 password_entry.bind("<Key>", on_entry)
 
 
-Button(login_frame,width=30,pady=7,text='Login',bg='#343131',fg='white').place(x=30,y=200)
+login_button = Button(login_frame,width=30,pady=7,text='Login',bg='#343131',fg='#c27572').place(x=30,y=230)
+
+def close_window():
+    root.destroy()
+
+close_button = Button(root, width=3, height=0, text='X', bg="#c27572", fg="black", font=['Robotto', 10, 'bold'],command=close_window )
+close_button.place(x=890,y=470)
 
 root.mainloop()
