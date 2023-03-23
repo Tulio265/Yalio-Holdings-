@@ -314,9 +314,9 @@ def add_new_employee():
     new_employee_window.geometry("640x650")
     #new_employee_window.config(bg="#F3D6D5")
 
-    global dateofbirth
     global enddate
     global startdate
+    global birthday
 ########################################################################################################################
     #New Employee Entity Details Form
     entity_details_frame = Frame(new_employee_window, width=300, height=200,relief='groove',bd=2)
@@ -394,23 +394,22 @@ def add_new_employee():
     dateofbirth_label.place(x=5, y=120)
     day_label = tk.Label(personal_details_frame, text="Day ")
     day_label.place(x=100, y=100)
-    day_menu = ttk.Combobox(personal_details_frame, values=days,width=2)
-    day_menu.current(0)
-    day_menu.place(x=102, y=120)
+    day_menu1 = ttk.Combobox(personal_details_frame, values=days,width=2)
+    day_menu1.current(0)
+    day_menu1.place(x=102, y=120)
 
     month_label = tk.Label(personal_details_frame, text="Month ")
     month_label.place(x=140, y=100)
-    month_menu = ttk.Combobox(personal_details_frame, values=months,width=10)
-    month_menu.current(0)
-    month_menu.place(x=142, y=120)
+    month_menu1 = ttk.Combobox(personal_details_frame, values=months,width=10)
+    month_menu1.current(0)
+    month_menu1.place(x=142, y=120)
 
     year_label = tk.Label(personal_details_frame, text="Year ")
     year_label.place(x=230, y=100)
-    year_menu = ttk.Combobox(personal_details_frame, values=years,width=4)
-    year_menu.current(len(years) - 1)
-    year_menu.place(x=232, y=120)
+    year_menu1 = ttk.Combobox(personal_details_frame, values=years,width=4)
+    year_menu1.current(len(years) - 1)
+    year_menu1.place(x=232, y=120)
 
-    dateofbirth = "{}-{}-{}".format(day_menu.get(), month_menu.get(), year_menu.get())
 
     #Gender Drop down Menu
     gender = ['Male','Female']
@@ -519,50 +518,66 @@ def add_new_employee():
     start_date.place(x=5,y=93)
     day_label = tk.Label(contract_details_frame, text="Day ")
     day_label.place(x=100, y=70)
-    day_menu = ttk.Combobox(contract_details_frame, values=days, width=2)
-    day_menu.current(0)
-    day_menu.place(x=102, y=90)
+    day_menu2 = ttk.Combobox(contract_details_frame, values=days, width=2)
+    day_menu2.current(0)
+    day_menu2.place(x=102, y=90)
 
     month_label = tk.Label(contract_details_frame, text="Month ")
     month_label.place(x=140, y=70)
-    month_menu = ttk.Combobox(contract_details_frame, values=months, width=10)
-    month_menu.current(0)
-    month_menu.place(x=142, y=90)
+    month_menu2 = ttk.Combobox(contract_details_frame, values=months, width=10)
+    month_menu2.current(0)
+    month_menu2.place(x=142, y=90)
 
     year_label = tk.Label(contract_details_frame, text="Year ")
     year_label.place(x=230, y=70)
-    year_menu = ttk.Combobox(contract_details_frame, values=years, width=4)
-    year_menu.current(len(years) - 1)
-    year_menu.place(x=232, y=90)
-
-    startdate = "{}-{}-{}".format(day_menu.get(), month_menu.get(), year_menu.get())
+    year_menu2 = ttk.Combobox(contract_details_frame, values=years, width=4)
+    year_menu2.current(len(years) - 1)
+    year_menu2.place(x=232, y=90)
 
     #END DATE
     end_date = Label(contract_details_frame, text='End Date: ')
     end_date.place(x=5, y=143)
     day_label = tk.Label(contract_details_frame, text="Day ")
     day_label.place(x=100, y=120)
-    day_menu = ttk.Combobox(contract_details_frame, values=days, width=2)
-    day_menu.current(0)
-    day_menu.place(x=102, y=140)
+    day_menu3 = ttk.Combobox(contract_details_frame, values=days, width=2)
+    day_menu3.current(0)
+    day_menu3.place(x=102, y=140)
 
     month_label = tk.Label(contract_details_frame, text="Month ")
     month_label.place(x=140, y=120)
-    month_menu = ttk.Combobox(contract_details_frame, values=months, width=10)
-    month_menu.current(0)
-    month_menu.place(x=142, y=140)
-
-    enddate = "{}-{}-{}".format(day_menu.get(), month_menu.get(), year_menu.get())
+    month_menu3 = ttk.Combobox(contract_details_frame, values=months, width=10)
+    month_menu3.current(0)
+    month_menu3.place(x=142, y=140)
 
     year_label = tk.Label(contract_details_frame, text="Year ")
     year_label.place(x=230, y=120)
-    year_menu = ttk.Combobox(contract_details_frame, values=years, width=4)
-    year_menu.current(len(years) - 1)
-    year_menu.place(x=232, y=140)
+    year_menu3 = ttk.Combobox(contract_details_frame, values=years, width=4)
+    year_menu3.current(len(years) - 1)
+    year_menu3.place(x=232, y=140)
 
+########################################################################################################################
+    # Define event listener function for comboboxes
+    def update_date(*args):
+        #birthday = "{}-{}-{}".format(day_menu1.get(), month_menu1.get(), year_menu1.get())
+        startdate = "{}-{}-{}".format(day_menu2.get(), month_menu2.get(), year_menu2.get())
+        enddate = "{}-{}-{}".format(day_menu3.get(), month_menu3.get(), year_menu3.get())
+        print(startdate, enddate,birthday)  # for testing
+
+    # Add event listeners to comboboxes
+    day_menu1.bind("<<ComboboxSelected>>", update_date)
+    month_menu1.bind("<<ComboboxSelected>>", update_date)
+    year_menu1.bind("<<ComboboxSelected>>", update_date)
+    day_menu2.bind("<<ComboboxSelected>>", update_date)
+    month_menu2.bind("<<ComboboxSelected>>", update_date)
+    year_menu2.bind("<<ComboboxSelected>>", update_date)
+    day_menu3.bind("<<ComboboxSelected>>", update_date)
+    month_menu3.bind("<<ComboboxSelected>>", update_date)
+    year_menu3.bind("<<ComboboxSelected>>", update_date)
+########################################################################################################################
     #REMEMBER TO INCLUDE CODE FOR CALCULATING CONTRACT PERIOD
     contract_period = Label(contract_details_frame,text='Contract Period : ')
     contract_period.place(x=5,y=180)
+########################################################################################################################
 
     #PAYROLL Details Frame
     payroll_details_frame = Frame(new_employee_window, width=290, height=120, relief='groove', bd=2)
@@ -629,7 +644,7 @@ def add_new_employee():
             "firstname": firstname,
             "middlename": middlename,
             "lastname": lastname,
-            "dateofbirth": dateofbirth,
+            #"dateofbirth":birthday,
             "gender": gender,
             "maritalstatus": maritalstatus,
             "natidnumber": natidnumber,
