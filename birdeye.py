@@ -7,6 +7,14 @@ import re
 #from tkinter import messagebox
 
 ###########################################################################################################
+#global variables
+birthday = None
+startdate = None
+enddate = None
+contract_period_days = 0
+contract_period_months = 0
+contract_period_years = 0
+
 #Database Management Code
 #Creating database connection
 
@@ -438,6 +446,7 @@ def add_new_employee():
     contact_details_label = Label(new_employee_window, text='PART C : Contact details ')
     contact_details_label.place(x=15, y=500)
 
+    #Code for checking if phone numbers are within 10 digits
     def validate_phone_number(phone_number):
         pattern = re.compile(r'^\d{10}$')  # phone number should consist of exactly 10 digits
         return bool(pattern.match(phone_number))
@@ -448,10 +457,12 @@ def add_new_employee():
     phoneone_entry = Entry(contact_details_frame, width=30, border=0)
     phoneone_entry.place(x=100, y=10)
 
+    phone_two_var = tk.StringVar()
     phonetwo_label = Label(contact_details_frame, text='Mobile Phone 2 : ')
     phonetwo_label.place(x=5, y=40)
-    phonetwo_entry = Entry(contact_details_frame, width=30, border=0)
+    phonetwo_entry = Entry(contact_details_frame, width=30, border=0,textvariable=phone_two_var)
     phonetwo_entry.place(x=100, y=40)
+    phone_two_var.set('0000000000')
 
     def run_code1(event):
         if not validate_phone_number(phoneone_entry.get()):
@@ -459,6 +470,7 @@ def add_new_employee():
             phoneone_entry.focus()
 
     phoneone_entry.bind("<FocusOut>",run_code1)
+
 
 
 
@@ -512,6 +524,7 @@ def add_new_employee():
     contract_type_menu = ttk.Combobox(contract_details_frame, values=contract_type, width=25)
     contract_type_menu.place(x=100, y=40)
 
+
     #contract period date picker
     #START DATE
     start_date = Label(contract_details_frame,text='Start Date: ')
@@ -558,10 +571,12 @@ def add_new_employee():
 ########################################################################################################################
     # Define event listener function for comboboxes
     def update_date(*args):
-        #birthday = "{}-{}-{}".format(day_menu1.get(), month_menu1.get(), year_menu1.get())
+        global birthday
+        global startdate
+        global enddate
+        birthday = "{}-{}-{}".format(day_menu1.get(), month_menu1.get(), year_menu1.get())
         startdate = "{}-{}-{}".format(day_menu2.get(), month_menu2.get(), year_menu2.get())
         enddate = "{}-{}-{}".format(day_menu3.get(), month_menu3.get(), year_menu3.get())
-        print(startdate, enddate,birthday)  # for testing
 
     # Add event listeners to comboboxes
     day_menu1.bind("<<ComboboxSelected>>", update_date)
@@ -574,9 +589,92 @@ def add_new_employee():
     month_menu3.bind("<<ComboboxSelected>>", update_date)
     year_menu3.bind("<<ComboboxSelected>>", update_date)
 ########################################################################################################################
-    #REMEMBER TO INCLUDE CODE FOR CALCULATING CONTRACT PERIOD
-    contract_period = Label(contract_details_frame,text='Contract Period : ')
-    contract_period.place(x=5,y=180)
+    #Code for calculating contract period
+    def contract_period_calculator(*args):
+        global contract_period_years
+        global contract_period_months
+        global contract_period_days
+
+        start_day = int(day_menu2.get())
+        end_day = int(day_menu3.get())
+        contract_period_days = end_day - start_day
+
+        #calculating months
+
+        month_dict = {
+            "January": 1,
+            "February": 2,
+            "March": 3,
+            "April": 4,
+            "May": 5,
+            "June": 6,
+            "July": 7,
+            "August": 8,
+            "September": 9,
+            "October": 10,
+            "November": 11,
+            "December": 12
+        }
+
+        start_month = month_dict[month_menu2.get()]
+        end_month = month_dict[month_menu3.get()]
+        contract_period_months = end_month - start_month
+
+        print(contract_period_months)
+
+        birth_year = int(year_menu1.get())
+        start_year = int(year_menu2.get())
+        end_year = int(year_menu3.get())
+        contract_period_years = end_year - start_year
+
+        if contract_type_menu.get() == "Full Time":
+            day_menu3.config(state="disabled")
+            month_menu3.config(state="disabled")
+            year_menu3.config(state="disabled")
+
+            contract_period_years = 65 - (start_year - birth_year)
+
+            day_menu3.set(str(day_menu2.get()))
+            month_menu3.set(str(month_menu2.get()))
+            year_menu3.set(str(contract_period_years + start_year))
+
+
+        else:
+            day_menu3.config(state="normal")
+            month_menu3.config(state="normal")
+            year_menu3.config(state="normal")
+
+
+
+        # update year_menu2
+        year_menu2_values = list(range(int(year_menu1.get()) + 18, int(year_menu1.get()) + 65))
+        year_menu2.configure(values=year_menu2_values)
+
+        contract_period_label = Label(contract_details_frame, text=f'Contract Period: {contract_period_years} years {contract_period_months} months {contract_period_days} days')
+        contract_period_label.place(x=5, y=180)
+
+
+    # bind the event to all the relevant dropdown menus
+    contract_type_menu.bind("<<ComboboxSelected>>", contract_period_calculator)
+    year_menu1.bind("<<ComboboxSelected>>", contract_period_calculator)
+    year_menu2.bind("<<ComboboxSelected>>", contract_period_calculator)
+    year_menu3.bind("<<ComboboxSelected>>", contract_period_calculator)
+    month_menu1.bind("<<ComboboxSelected>>", contract_period_calculator)
+    month_menu2.bind("<<ComboboxSelected>>", contract_period_calculator)
+    month_menu3.bind("<<ComboboxSelected>>", contract_period_calculator)
+    day_menu1.bind("<<ComboboxSelected>>", contract_period_calculator)
+    day_menu2.bind("<<ComboboxSelected>>", contract_period_calculator)
+    day_menu3.bind("<<ComboboxSelected>>", contract_period_calculator)
+
+
+
+
+
+
+
+
+
+
 ########################################################################################################################
 
     #PAYROLL Details Frame
@@ -615,6 +713,7 @@ def add_new_employee():
     system_access_check.place(x=340,y=605)
 
     def save_employee():
+        global birthday
         firstname = firstname_entry.get()
         middlename = middlename_entry.get()
         lastname = lastname_entry.get()
@@ -644,7 +743,7 @@ def add_new_employee():
             "firstname": firstname,
             "middlename": middlename,
             "lastname": lastname,
-            #"dateofbirth":birthday,
+            "dateofbirth": birthday,
             "gender": gender,
             "maritalstatus": maritalstatus,
             "natidnumber": natidnumber,
@@ -675,7 +774,7 @@ def add_new_employee():
         employee_db.close()
 
         employees_tree.delete(*employees_tree.get_children())
-
+        #Code for retrieving specific columns and display to tree view
         database_view = employee_database("localhost", "tulio", "MACTulio95", "employeedatabase")
         emp_info = database_view.retrieve_data(
             columns=['id', 'firstname', 'lastname', 'jobposition', 'department', 'company'])
@@ -684,7 +783,7 @@ def add_new_employee():
         for row in emp_info:
             employees_tree.insert('', 'end', values=row)
 
-        notification_bar(new_employee_window,"Employee added Successfully!",'bad')
+        notification_bar(new_employee_window,"Employee added Successfully!",'good')
         new_employee_window.after(1500, new_employee_window.withdraw)
 
 
