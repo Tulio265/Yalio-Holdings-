@@ -238,7 +238,7 @@ emp_dashboard_label.place(x=50,y=10)
 
 #EMS Dashboard Buttons and Elements
 
-#TAB Selection Fucntions
+#TAB Selection Functions
 
 def show_emp_man ():
     employees_view_port.select(employees_management)
@@ -276,15 +276,12 @@ employees_view_port.add(employees_management,text='Employee Management')
 
 #Employee management elements search box ,add button and table with list
 
-#SEARCH BOX ENTRY FIELD AND SEACH BUTTON
-employee_search = Entry(employees_management,width=70,bg='#c27572',fg='white',border=0,font=('Dubai',11))
-employee_search.place(y=50,x=300)
-employee_search.insert(0,'Enter Employee name or Employee Number')
-employee_search.bind("<FocusIn>", lambda e: on_entry_focus(e, employee_search, 'Enter Employee name or Employee Number'))
-employee_search.bind("<FocusOut>", lambda e: on_entry_blur(e, employee_search, 'Enter Employee name or Employee Number'))
-
-employee_search_button =Button(employees_management,width=8,bg='#c27572',relief='flat',fg='white',height=1,text='Search')
-employee_search_button.place(y=51,x=796)
+#SEARCH BOX ENTRY FIELD AND SEARCH BUTTON
+employee_search_entry = Entry(employees_management,width=70,bg='#c27572',fg='white',border=0,font=('Dubai',11))
+employee_search_entry.place(y=50,x=300)
+employee_search_entry.insert(0,'Enter Employee name or Employee Number')
+employee_search_entry.bind("<FocusIn>", lambda e: on_entry_focus(e, employee_search_entry, 'Enter Employee name or Employee Number'))
+employee_search_entry.bind("<FocusOut>", lambda e: on_entry_blur(e, employee_search_entry, 'Enter Employee name or Employee Number'))
 
 #Tree to show Employees as table
 employees_tree = ttk.Treeview(employees_management,columns=('Employee ID','Full Name','Last Name','Position','Department','Company'),show='headings')
@@ -313,6 +310,33 @@ database_view.close()
 
 for row in emp_info:
     employees_tree.insert('', 'end', values=row)
+
+
+#Treeview Search Function
+#Code to retreive contents from the Database according to search string
+
+def employ_search():
+    search_string = employee_search_entry.get()
+    if search_string.lower() == 'enter employee name or employee number' :
+        # If search criteria is empty or default, display all employees
+        employees_tree.delete(*employees_tree.get_children())
+        for row in emp_info:
+            employees_tree.insert('', 'end', values=row)
+        employee_search.delete(0, 'end')
+        employee_search.insert(0, 'Enter Employee name or Employee Number')
+        employee_search.configure(fg='white')
+        employee_search_button.configure(text='Search')
+    else:
+        # Display matching employees
+        matching_rows = [row for row in emp_info if search_string.lower() in row[1].lower() or search_string.lower() in row[2].lower()]
+        employees_tree.delete(*employees_tree.get_children())
+        for row in matching_rows:
+            employees_tree.insert('', 'end', values=row)
+        employee_search_button.configure(text='Clear')
+
+
+employee_search_button =Button(employees_management,width=8,bg='#c27572',relief='flat',fg='white',height=1,text='Search',command=employ_search)
+employee_search_button.place(y=51,x=796)
 
 #Adding an Employee Buttoon and Data Entry Window
 #Add Employee Information Function and Create New Window for data entry
@@ -620,7 +644,6 @@ def add_new_employee():
         end_month = month_dict[month_menu3.get()]
         contract_period_months = end_month - start_month
 
-        print(contract_period_months)
 
         birth_year = int(year_menu1.get())
         start_year = int(year_menu2.get())
