@@ -317,26 +317,35 @@ for row in emp_info:
 
 def employ_search():
     search_string = employee_search_entry.get()
-    if search_string.lower() == 'enter employee name or employee number' :
-        # If search criteria is empty or default, display all employees
-        employees_tree.delete(*employees_tree.get_children())
-        for row in emp_info:
-            employees_tree.insert('', 'end', values=row)
-        employee_search.delete(0, 'end')
-        employee_search.insert(0, 'Enter Employee name or Employee Number')
-        employee_search.configure(fg='white')
-        employee_search_button.configure(text='Search')
-    else:
-        # Display matching employees
-        matching_rows = [row for row in emp_info if search_string.lower() in row[1].lower() or search_string.lower() in row[2].lower()]
-        employees_tree.delete(*employees_tree.get_children())
+    matching_rows = [row for row in emp_info if search_string in str(row[0]) or search_string.lower() in row[1].lower() or search_string.lower() in row[2].lower()]
+
+    employees_tree.delete(*employees_tree.get_children())
+
+    if matching_rows:
         for row in matching_rows:
             employees_tree.insert('', 'end', values=row)
-        employee_search_button.configure(text='Clear')
+        clear_button.place(y=51, x=796) # show the Clear button
+    else:
+        for row in emp_info:
+            employees_tree.insert('', 'end', values=row)
+        clear_button.place_forget() # hide the Clear button
+
+def clear_search_results():
+    employee_search_entry.delete(0, 'end')
+    employee_search_entry.insert(0, 'Enter Employee name or Employee Number')
+    employees_tree.delete(*employees_tree.get_children())
+    for row in emp_info:
+        employees_tree.insert('', 'end', values=row)
+    clear_button.place_forget() # hide the Clear button
 
 
 employee_search_button =Button(employees_management,width=8,bg='#c27572',relief='flat',fg='white',height=1,text='Search',command=employ_search)
 employee_search_button.place(y=51,x=796)
+
+clear_button = Button(employees_management, width=8, bg='#c27572', relief='flat', fg='white', height=1, text='Clear', command=clear_search_results)
+
+clear_button.bind("<Button-1>", lambda e: clear_search_results())
+clear_button.place_forget()
 
 #Adding an Employee Buttoon and Data Entry Window
 #Add Employee Information Function and Create New Window for data entry
