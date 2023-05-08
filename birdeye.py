@@ -34,6 +34,12 @@ class employee_database:
         self.connection.commit()
         pass
 
+    def update_employee(self, row_id, data):
+        update_query = "UPDATE employees SET firstname = %s, middlename = %s, lastname = %s, dateofbirth = %s, gender = %s, maritalstatus = %s, natidnumber = %s, country = %s, district = %s, company = %s, department = %s, mobilephone1 = %s, mobilephone2 = %s, emailaddress = %s, physicaladdress = %s, spousename = %s, spousecontact = %s, children = %s, jobposition = %s, contracttype = %s, startdate = %s, enddate = %s, basicpay = %s, hourlyrate = %s, overtime = %s, bankaccount = %s, bank = %s WHERE id = %s"
+        values = tuple(data.values()) + (row_id,)
+        self.cursor.execute(update_query, values)
+        self.connection.commit()
+
     def retrieve_data(self, row_id=None, columns=None):
         """
         Retrieve data from the "employees" table in the database.
@@ -347,6 +353,11 @@ clear_button = Button(employees_management, width=8, bg='#c27572', relief='flat'
 clear_button.bind("<Button-1>", lambda e: clear_search_results())
 clear_button.place_forget()
 
+def show_emp_man_tooltip(event):
+    empman_tool_tip_label = Label(employees_management,text ="Double Click to edit Employee Information",bd=0)
+    empman_tool_tip_label.place(y=80,x=500)
+    empman_tool_tip_label.after(2000, empman_tool_tip_label.destroy)
+
 #Adding an Employee Buttoon and Data Entry Window
 #Add Employee Information Function and Create New Window for data entry
 def add_new_employee():
@@ -373,7 +384,7 @@ def add_new_employee():
     country_var = tk.StringVar()
     district_var = tk.StringVar()
     company_var = tk.StringVar()
-    department_var= tk.StringVar()
+    department_var = tk.StringVar()
 
     country_var.set(country_options[0])
     district_var.set(district_options[0])
@@ -828,6 +839,499 @@ def add_new_employee():
 add_emp_icon = PhotoImage(file="C:\\Users\\Aramex\\OneDrive\\Pictures\\Saved Pictures\\addemp11.png")
 add_employee_button =Button(employees_management,image=add_emp_icon,bd=0,command=add_new_employee)
 add_employee_button.place(y=10,x=1000)
+
+
+#Code to edit existing records
+########################################################################################################################
+def get_employee_by_id(event):
+    selected_row = employees_tree.focus()
+    emp_id = employees_tree.item(selected_row)['values'][0]
+    db = employee_database("localhost", "tulio", "MACTulio95", "employeedatabase")
+    emp_info = db.retrieve_data(row_id=emp_id)
+    db.close()
+    edit_employee(emp_info)
+
+def edit_employee(emp_data):
+    edit_employee_window = tk.Toplevel(main_window)
+    edit_employee_window.title("Edit Record")
+    edit_employee_window.geometry("640x650")
+    # edit_employee_window.config(bg="#F3D6D5")
+
+    global enddate
+    global startdate
+    global birthday
+    ####################################################################################################################
+    # New Employee Entity Details Form
+    entity_details_frame = Frame(edit_employee_window, width=300, height=200, relief='groove', bd=2)
+    entity_details_frame.place(x=10, y=20)
+    entity_details_label = Label(edit_employee_window, text='PART A : Entity Details ')
+    entity_details_label.place(x=15, y=10)
+    # Drop down Menu's
+    country_options = ["-Select-", "Malawi"]
+    district_options = ["-Select-", "Blantyre", "Lilongwe", "Mulanje", "Zomba", "Thyolo"]
+    company_options = ["-Select-", "Yalio Poultry", "Yalio Technologies", "Yalio Transport", "Yalio Retail"]
+    department_options = ["-Select-", "Accounts and Finance", "Human Resource", "Operations", "Sales and Marketing"]
+
+    country_var = tk.StringVar()
+    district_var = tk.StringVar()
+    company_var = tk.StringVar()
+    department_var = tk.StringVar()
+
+    country_label = Label(entity_details_frame, text='Country : ')
+    country_label.place(x=5, y=30)
+    country_dropdown = ttk.OptionMenu(entity_details_frame, country_var, *country_options, direction='flush')
+    country_dropdown.place(x=80, y=30)
+    country_var.set(emp_data[0][8])
+
+    district_label = Label(entity_details_frame, text='District :')
+    district_label.place(x=5, y=70)
+    district_dropdown = ttk.OptionMenu(entity_details_frame, district_var, *district_options, direction="flush")
+    district_dropdown.place(x=80, y=70)
+    district_var.set(emp_data[0][9])
+
+    company_label = Label(entity_details_frame, text='Company :')
+    company_label.place(x=5, y=110)
+    company_dropdown = ttk.OptionMenu(entity_details_frame, company_var, *company_options, direction="flush")
+    company_dropdown.place(x=80, y=110)
+    company_var.set(emp_data[0][10])
+
+    department_label = Label(entity_details_frame, text='Department :')
+    department_label.place(x=5, y=150)
+    department_dropdown = ttk.OptionMenu(entity_details_frame, department_var, *department_options, direction="flush")
+    department_dropdown.place(x=80, y=150)
+    department_var.set(emp_data[0][11])
+    ####################################################################################################################
+
+    ####################################################################################################################
+    # New Employee Personal Details Form
+    personal_details_frame = Frame(edit_employee_window, width=300, height=250, relief='groove', bd=2)
+    personal_details_frame.place(x=10, y=240)
+    personal_details_label = Label(edit_employee_window, text='PART B : Personal details ')
+    personal_details_label.place(x=15, y=230)
+
+    firstname_label = Label(personal_details_frame, text='First Name : ')
+    firstname_label.place(x=5, y=10)
+    firstname_entry = Entry(personal_details_frame, width=30, border=0)
+    firstname_entry.place(x=100, y=10)
+    firstname_entry.insert(0, emp_data[0][1])
+
+    middlename_label = Label(personal_details_frame, text='Middle Name : ')
+    middlename_label.place(x=5, y=40)
+    middlename_entry = Entry(personal_details_frame, width=30, border=0)
+    middlename_entry.place(x=100, y=40)
+    middlename_entry.insert(0,emp_data[0][2])
+
+    lastname_label = Label(personal_details_frame, text='Last Name : ')
+    lastname_label.place(x=5, y=70)
+    lastname_entry = Entry(personal_details_frame, width=30, border=0)
+    lastname_entry.place(x=100, y=70)
+    lastname_entry.insert(0,emp_data[0][3])
+
+    # Date of birth data by 3 dropdown menus
+    # Define the options for the day, month, and year drop-down menus
+    days = list(range(1, 32))
+    months = ["January", "February", "March", "April", "May", "June",
+              "July", "August", "September", "October", "November", "December"]
+    years = list(range(1900, 2100))
+
+    # Create the day, month, and year drop-down menus
+    dateofbirth_label = tk.Label(personal_details_frame, text='Date of Birth : ')
+    dateofbirth_label.place(x=5, y=120)
+    day_label = tk.Label(personal_details_frame, text="Day ")
+    day_label.place(x=100, y=100)
+    day_menu1 = ttk.Combobox(personal_details_frame, values=days, width=2)
+    day_menu1.current(0)
+    day_menu1.place(x=102, y=120)
+
+    month_label = tk.Label(personal_details_frame, text="Month ")
+    month_label.place(x=140, y=100)
+    month_menu1 = ttk.Combobox(personal_details_frame, values=months, width=10)
+    month_menu1.current(0)
+    month_menu1.place(x=142, y=120)
+
+    year_label = tk.Label(personal_details_frame, text="Year ")
+    year_label.place(x=230, y=100)
+    year_menu1 = ttk.Combobox(personal_details_frame, values=years, width=4)
+    year_menu1.current(len(years) - 1)
+    year_menu1.place(x=232, y=120)
+
+    # Gender Drop down Menu
+    gender = ['Male', 'Female']
+    gender_label = tk.Label(personal_details_frame, text='Sex : ')
+    gender_label.place(x=5, y=160)
+    gender_menu = ttk.Combobox(personal_details_frame, values=gender, width=10)
+    gender_menu.place(x=100, y=160)
+    gender_menu.set(emp_data[0][5])
+
+    # Marital Status drop down Menu
+    marital_status = ['Single', 'Married', 'Divorced', 'Widowed', 'Separated']
+    marital_status_label = tk.Label(personal_details_frame, text='Marital Status : ')
+    marital_status_label.place(x=5, y=190)
+    marital_status_menu = ttk.Combobox(personal_details_frame, values=marital_status, width=10)
+    marital_status_menu.place(x=100, y=190)
+    marital_status_menu.set(emp_data[0][6])
+
+    id_number_label = Label(personal_details_frame, text='ID Number : ')
+    id_number_label.place(x=5, y=220)
+    id_number_entry = Entry(personal_details_frame, width=30, border=0)
+    id_number_entry.place(x=100, y=220)
+    id_number_entry.insert(0,emp_data[0][7])
+    ####################################################################################################################
+
+    ####################################################################################################################
+    # New Employee Contact Details Form
+    contact_details_frame = Frame(edit_employee_window, width=300, height=120, relief='groove', bd=2)
+    contact_details_frame.place(x=10, y=510)
+    contact_details_label = Label(edit_employee_window, text='PART C : Contact details ')
+    contact_details_label.place(x=15, y=500)
+
+    # Code for checking if phone numbers are within 10 digits
+    def validate_phone_number(phone_number):
+        pattern = re.compile(r'^\d{10}$')  # phone number should consist of exactly 10 digits
+        return bool(pattern.match(phone_number))
+
+    phoneone_label = Label(contact_details_frame, text='Mobile Phone 1 : ')
+    phoneone_label.place(x=5, y=10)
+    phoneone_entry = Entry(contact_details_frame, width=30, border=0)
+    phoneone_entry.place(x=100, y=10)
+    phoneone_entry.insert(0,emp_data[0][12])
+
+    phone_two_var = tk.StringVar()
+    phonetwo_label = Label(contact_details_frame, text='Mobile Phone 2 : ')
+    phonetwo_label.place(x=5, y=40)
+    phonetwo_entry = Entry(contact_details_frame, width=30, border=0, textvariable=phone_two_var)
+    phonetwo_entry.place(x=100, y=40)
+    phone_two_var.set(emp_data[0][13])
+
+    def run_code1(event):
+        if not validate_phone_number(phoneone_entry.get()):
+            notification_bar(edit_employee_window, 'Please enter a valid 10-digit phone number', 'bad')
+            phoneone_entry.focus()
+
+    phoneone_entry.bind("<FocusOut>", run_code1)
+
+    email_label = Label(contact_details_frame, text='Email address : ')
+    email_label.place(x=5, y=70)
+    email_entry = Entry(contact_details_frame, width=30, border=0)
+    email_entry.place(x=100, y=70)
+    email_entry.insert(0,emp_data[0][14])
+
+    physical_address_label = Label(contact_details_frame, text='Physical address : ')
+    physical_address_label.place(x=5, y=95)
+    physical_address_entry = Entry(contact_details_frame, width=30, border=0)
+    physical_address_entry.place(x=100, y=95)
+    physical_address_entry.insert(0,emp_data[0][15])
+
+    # New Employee Beneficiary details
+    beneficiary_details_frame = Frame(edit_employee_window, width=290, height=200, relief='groove', bd=2)
+    beneficiary_details_frame.place(x=335, y=20)
+    beneficiary_details_label = Label(edit_employee_window, text='PART D : Beneficiary Details ')
+    beneficiary_details_label.place(x=340, y=10)
+
+    spouse_name_label = Label(beneficiary_details_frame, text='Spouse Name : ')
+    spouse_name_label.place(x=5, y=10)
+    spouse_name_entry = Entry(beneficiary_details_frame, width=25, border=0)
+    spouse_name_entry.place(x=100, y=10)
+    spouse_name_entry.insert(0,emp_data[0][16])
+
+    spouse_contact_label = Label(beneficiary_details_frame, text='Spouse Contact : ')
+    spouse_contact_label.place(x=5, y=40)
+    spouse_contact_entry = Entry(beneficiary_details_frame, width=25, border=0)
+    spouse_contact_entry.place(x=100, y=40)
+    spouse_contact_entry.insert(0,emp_data[0][17])
+
+    minor_beneficiary_label = Label(beneficiary_details_frame, text="Childens and other Beneficiaires : ")
+    minor_beneficiary_label.place(x=5, y=70)
+    beneficiary_details_text = Text(beneficiary_details_frame, width=30, height=5)
+    beneficiary_details_text.place(x=10, y=100)
+    beneficiary_details_text.insert(1.0,emp_data[0][18])
+
+    # Contract Details Form frame
+    contract_details_frame = Frame(edit_employee_window, width=290, height=220, relief='groove', bd=2)
+    contract_details_frame.place(x=335, y=240)
+    contract_details_label = Label(edit_employee_window, text='PART E : Contract Details ')
+    contract_details_label.place(x=340, y=230)
+
+    position_title = ['Ground Manual Worker', 'Irrigation Technician', 'Animal Caretaker', 'Tractor Operator',
+                      'Field Supervisor', 'Farm Manager', 'Marketing Specialist', 'Accountant',
+                      'Human Resources Coordinator', 'Operations Director', 'Administration Officer']
+    position_title_label = tk.Label(contract_details_frame, text='Job Position : ')
+    position_title_label.place(x=5, y=10)
+    position_menu = ttk.Combobox(contract_details_frame, values=position_title, width=25)
+    position_menu.place(x=100, y=10)
+    position_menu.insert(0,emp_data[0][19])
+
+    contract_type = ['Fixed-Term', 'Full Time', 'Internship']
+    contract_type_label = tk.Label(contract_details_frame, text='Contract Type : ')
+    contract_type_label.place(x=5, y=40)
+    contract_type_menu = ttk.Combobox(contract_details_frame, values=contract_type, width=25)
+    contract_type_menu.place(x=100, y=40)
+    contract_type_menu.insert(0,emp_data[0][20])
+
+    # contract period date picker
+    # START DATE
+    start_date = Label(contract_details_frame, text='Start Date: ')
+    start_date.place(x=5, y=93)
+    day_label = tk.Label(contract_details_frame, text="Day ")
+    day_label.place(x=100, y=70)
+    day_menu2 = ttk.Combobox(contract_details_frame, values=days, width=2)
+    day_menu2.current(0)
+    day_menu2.place(x=102, y=90)
+
+    month_label = tk.Label(contract_details_frame, text="Month ")
+    month_label.place(x=140, y=70)
+    month_menu2 = ttk.Combobox(contract_details_frame, values=months, width=10)
+    month_menu2.current(0)
+    month_menu2.place(x=142, y=90)
+
+    year_label = tk.Label(contract_details_frame, text="Year ")
+    year_label.place(x=230, y=70)
+    year_menu2 = ttk.Combobox(contract_details_frame, values=years, width=4)
+    year_menu2.current(len(years) - 1)
+    year_menu2.place(x=232, y=90)
+
+    # END DATE
+    end_date = Label(contract_details_frame, text='End Date: ')
+    end_date.place(x=5, y=143)
+    day_label = tk.Label(contract_details_frame, text="Day ")
+    day_label.place(x=100, y=120)
+    day_menu3 = ttk.Combobox(contract_details_frame, values=days, width=2)
+    day_menu3.current(0)
+    day_menu3.place(x=102, y=140)
+
+    month_label = tk.Label(contract_details_frame, text="Month ")
+    month_label.place(x=140, y=120)
+    month_menu3 = ttk.Combobox(contract_details_frame, values=months, width=10)
+    month_menu3.current(0)
+    month_menu3.place(x=142, y=140)
+
+    year_label = tk.Label(contract_details_frame, text="Year ")
+    year_label.place(x=230, y=120)
+    year_menu3 = ttk.Combobox(contract_details_frame, values=years, width=4)
+    year_menu3.current(len(years) - 1)
+    year_menu3.place(x=232, y=140)
+
+    ####################################################################################################################
+    # Define event listener function for comboboxes
+    def update_date(*args):
+        global birthday
+        global startdate
+        global enddate
+        birthday = "{}-{}-{}".format(day_menu1.get(), month_menu1.get(), year_menu1.get())
+        startdate = "{}-{}-{}".format(day_menu2.get(), month_menu2.get(), year_menu2.get())
+        enddate = "{}-{}-{}".format(day_menu3.get(), month_menu3.get(), year_menu3.get())
+
+    # Add event listeners to comboboxes
+    day_menu1.bind("<<ComboboxSelected>>", update_date)
+    month_menu1.bind("<<ComboboxSelected>>", update_date)
+    year_menu1.bind("<<ComboboxSelected>>", update_date)
+    day_menu2.bind("<<ComboboxSelected>>", update_date)
+    month_menu2.bind("<<ComboboxSelected>>", update_date)
+    year_menu2.bind("<<ComboboxSelected>>", update_date)
+    day_menu3.bind("<<ComboboxSelected>>", update_date)
+    month_menu3.bind("<<ComboboxSelected>>", update_date)
+    year_menu3.bind("<<ComboboxSelected>>", update_date)
+
+    ####################################################################################################################
+    # Code for calculating contract period
+    def contract_period_calculator(*args):
+        global contract_period_years
+        global contract_period_months
+        global contract_period_days
+
+        start_day = int(day_menu2.get())
+        end_day = int(day_menu3.get())
+        contract_period_days = end_day - start_day
+
+        # calculating months
+
+        month_dict = {
+            "January": 1,
+            "February": 2,
+            "March": 3,
+            "April": 4,
+            "May": 5,
+            "June": 6,
+            "July": 7,
+            "August": 8,
+            "September": 9,
+            "October": 10,
+            "November": 11,
+            "December": 12
+        }
+
+        start_month = month_dict[month_menu2.get()]
+        end_month = month_dict[month_menu3.get()]
+        contract_period_months = end_month - start_month
+
+        birth_year = int(year_menu1.get())
+        start_year = int(year_menu2.get())
+        end_year = int(year_menu3.get())
+        contract_period_years = end_year - start_year
+
+        if contract_type_menu.get() == "Full Time":
+            day_menu3.config(state="disabled")
+            month_menu3.config(state="disabled")
+            year_menu3.config(state="disabled")
+
+            contract_period_years = 65 - (start_year - birth_year)
+
+            day_menu3.set(str(day_menu2.get()))
+            month_menu3.set(str(month_menu2.get()))
+            year_menu3.set(str(contract_period_years + start_year))
+
+
+        else:
+            day_menu3.config(state="normal")
+            month_menu3.config(state="normal")
+            year_menu3.config(state="normal")
+
+        # update year_menu2
+        year_menu2_values = list(range(int(year_menu1.get()) + 18, int(year_menu1.get()) + 65))
+        year_menu2.configure(values=year_menu2_values)
+
+        contract_period_label = Label(contract_details_frame,
+                                      text=f'Contract Period: {contract_period_years} years {contract_period_months} months {contract_period_days} days')
+        contract_period_label.place(x=5, y=180)
+
+    # bind the event to all the relevant dropdown menus
+    contract_type_menu.bind("<<ComboboxSelected>>", contract_period_calculator)
+    year_menu1.bind("<<ComboboxSelected>>", contract_period_calculator)
+    year_menu2.bind("<<ComboboxSelected>>", contract_period_calculator)
+    year_menu3.bind("<<ComboboxSelected>>", contract_period_calculator)
+    month_menu1.bind("<<ComboboxSelected>>", contract_period_calculator)
+    month_menu2.bind("<<ComboboxSelected>>", contract_period_calculator)
+    month_menu3.bind("<<ComboboxSelected>>", contract_period_calculator)
+    day_menu1.bind("<<ComboboxSelected>>", contract_period_calculator)
+    day_menu2.bind("<<ComboboxSelected>>", contract_period_calculator)
+    day_menu3.bind("<<ComboboxSelected>>", contract_period_calculator)
+
+    ####################################################################################################################
+
+    # PAYROLL Details Frame
+    payroll_details_frame = Frame(edit_employee_window, width=290, height=120, relief='groove', bd=2)
+    payroll_details_frame.place(x=335, y=480)
+    contact_details_label = Label(edit_employee_window, text='PART F : Payroll details ')
+    contact_details_label.place(x=340, y=470)
+
+    basic_pay_label = Label(payroll_details_frame, text='Basic Pay : ')
+    basic_pay_label.place(x=5, y=10)
+    basic_pay_entry = Entry(payroll_details_frame, width=25, border=0)
+    basic_pay_entry.place(x=100, y=10)
+    basic_pay_entry.insert(0,emp_data[0][23])
+
+    hourly_rate_label = Label(payroll_details_frame, text='Hourly Rate : ')
+    hourly_rate_label.place(x=5, y=35)
+    hourly_rate_entry = Entry(payroll_details_frame, width=25, border=0)
+    hourly_rate_entry.place(x=100, y=35)
+    hourly_rate_entry.insert(0,emp_data[0][24])
+
+    overtime_rate_label = Label(payroll_details_frame, text='Overtime Hourly Rate : ')
+    overtime_rate_label.place(x=5, y=65)
+    overtime_rate_entry = Entry(payroll_details_frame, width=25, border=0)
+    overtime_rate_entry.place(x=100, y=65)
+    overtime_rate_entry.insert(0,emp_data[0][25])
+
+    bank_account_label = Label(payroll_details_frame, text='Bank Account : ')
+    bank_account_label.place(x=5, y=90)
+    bank_account_entry = Entry(payroll_details_frame, width=15, border=0)
+    bank_account_entry.place(x=100, y=90)
+    bank_account_entry.insert(0,emp_data[0][26])
+
+    banks = ['National Bank', 'Standard Bank', 'FDH Bank', 'First Capital Bank', 'NBS Bank Plc',
+             'MyBucks Banking Corporation']
+    bank_menu = ttk.Combobox(payroll_details_frame, values=banks, width=12)
+    bank_menu.current(0)
+    bank_menu.place(x=190, y=90)
+    bank_menu.set(emp_data[0][27])
+
+    give_access = StringVar()
+    system_access_check = ttk.Checkbutton(edit_employee_window, text='Recommend for System access ',
+                                          variable=give_access, onvalue='metric', offvalue='imperial')
+    system_access_check.place(x=340, y=605)
+    def update_employee():
+        global birthday
+        firstname = firstname_entry.get()
+        middlename = middlename_entry.get()
+        lastname = lastname_entry.get()
+        gender = gender_menu.get()
+        maritalstatus = marital_status_menu.get()
+        natidnumber = id_number_entry.get()
+        country = country_var.get()
+        district = district_var.get()
+        company = company_var.get()
+        department = department_var.get()
+        mobilephone1 = phoneone_entry.get()
+        mobilephone2 = phonetwo_entry.get()
+        emailaddress = email_entry.get()
+        physicaladdress = physical_address_entry.get()
+        spousename = spouse_name_entry.get()
+        spousecontact = spouse_contact_entry.get()
+        children = beneficiary_details_text.get('1.0', 'end')
+        jobposition = position_menu.get()
+        contracttype = contract_type_menu.get()
+        basicpay = basic_pay_entry.get()
+        hourlyrate = hourly_rate_entry.get()
+        overtime = overtime_rate_entry.get()
+        bankaccount = bank_account_entry.get()
+        bank = bank_menu.get()
+
+        newdata = {
+            "firstname": firstname,
+            "middlename": middlename,
+            "lastname": lastname,
+            "dateofbirth": birthday,
+            "gender": gender,
+            "maritalstatus": maritalstatus,
+            "natidnumber": natidnumber,
+            "country": country,
+            "district": district,
+            "company": company,
+            "department": department,
+            "mobilephone1": mobilephone1,
+            "mobilephone2": mobilephone2,
+            "emailaddress": emailaddress,
+            "physicaladdress": physicaladdress,
+            "spousename": spousename,
+            "spousecontact": spousecontact,
+            "children": children,
+            "jobposition": jobposition,
+            "contracttype": contracttype,
+            "startdate": startdate,
+            "enddate": enddate,
+            "basicpay": basicpay,
+            "hourlyrate": hourlyrate,
+            "overtime": overtime,
+            "bankaccount": bankaccount,
+            "bank": bank
+        }
+        employee_db = employee_database("localhost", "tulio", "MACTulio95", "employeedatabase")
+        employee_db.update_employee(emp_data[0][0], newdata)
+        employee_db.commit()
+        employee_db.close()
+
+        employees_tree.delete(*employees_tree.get_children())
+        # Code for retrieving specific columns and display to tree view
+        database_view = employee_database("localhost", "tulio", "MACTulio95", "employeedatabase")
+        emp_info = database_view.retrieve_data(
+            columns=['id', 'firstname', 'lastname', 'jobposition', 'department', 'company'])
+        database_view.close()
+
+        for row in emp_info:
+            employees_tree.insert('', 'end', values=row)
+
+        notification_bar(edit_employee_window, "Employee Updated Successfully!", 'good')
+        edit_employee_window.after(1500, edit_employee_window.withdraw)
+
+    save_button = Button(edit_employee_window, text='Save', width=10, height=1, font=('Dubai', 10),
+                         background='#1E8449',
+                         command=update_employee)
+    save_button.place(x=540, y=605)
+
+employees_tree.bind("<<TreeviewSelect>>",show_emp_man_tooltip)
+employees_tree.bind("<Double-Button-1>", get_employee_by_id)
+
+########################################################################################################################
 
 
 entity_management =ttk.Frame(employees_view_port)
