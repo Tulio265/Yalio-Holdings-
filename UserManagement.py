@@ -10,7 +10,7 @@ login_window.title('Yalio Holdings - Login')
 login_window.overrideredirect(True)
 login_window.resizable(False, False)
 login_window.configure(bg='#343131')
-
+login_window.attributes('-alpha', 0.9) 
 # Center the window on the screen
 screen_width = login_window.winfo_screenwidth()
 screen_height = login_window.winfo_screenheight()
@@ -78,7 +78,7 @@ def user_login():
 icon_path = 'login.png'  # Update the path to the icon file as necessary
 if os.path.exists(icon_path):
     login_icon = PhotoImage(file=icon_path)
-    Label(login_window, image=login_icon, border='0', bg='#343131').place(y=50, x=50)
+    Label(login_window, image=login_icon, border='0',bg='#343131',relief="sunken").place(y=90, x=120)
 else:
     print(f"Error: {icon_path} not found. Please check the file path.")
 
@@ -86,7 +86,7 @@ else:
 login_frame = Frame(login_window, width=350, height=390, bg='#343131')
 login_frame.place(y=50, x=480)
 
-login_label = ttk.Label(login_frame, foreground='#c27572', background='#343131', text='Login', font=('Dubai', 22, 'bold'))
+login_label = ttk.Label(login_frame, foreground='#c27572', background='#343131', text='User Login', font=('Dubai', 22, 'bold'))
 login_label.place(y=55, x=5)
 
 # Username entry
